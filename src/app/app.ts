@@ -7,9 +7,15 @@ import { LedgerViewComponent } from './ledger-view/ledger-view.component';
   selector: 'app-root',
   standalone: true,
   imports: [JournalListComponent, JournalEntryComponent, LedgerViewComponent],
-  templateUrl: './app.html',
-  styleUrl: './app.scss'
+  template: `
+    <h1>Accounting Dashboard</h1>
+    <div style="display: flex; gap: 20px;">
+      <app-journal-entry />
+      <app-journal-list />
+      <app-ledger-view />
+    </div>
+  `
 })
-export class App {
+export class AppComponent {
   title = 'Accounting Dashboard';
 }

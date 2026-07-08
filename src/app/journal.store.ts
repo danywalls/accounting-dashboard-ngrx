@@ -1,4 +1,4 @@
-import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
+import { signalStore, withState, withComputed, withMethods, withHooks, patchState } from '@ngrx/signals';
 import { computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
@@ -23,7 +23,29 @@ type JournalState = {
   isLoading: boolean;
 };
 
-const initialState: JournalState = { entries: [], isLoading: false };
+const initialState: JournalState = { 
+  entries: [
+    {
+      id: 1,
+      date: '2026-07-01',
+      description: 'Initial Opening Balance',
+      lines: [
+        { accountCode: '101', debit: 5000, credit: 0 },
+        { accountCode: '301', debit: 0, credit: 5000 }
+      ]
+    },
+    {
+      id: 2,
+      date: '2026-07-08',
+      description: 'Service Revenue Recognition',
+      lines: [
+        { accountCode: '102', debit: 1200, credit: 0 },
+        { accountCode: '401', debit: 0, credit: 1200 }
+      ]
+    }
+  ], 
+  isLoading: false 
+};
 
 function totalDebits(entries: JournalEntry[]): number {
   return entries.reduce((sum, e) =>
@@ -67,5 +89,11 @@ export const JournalStore = signalStore(
     addEntry(entry: JournalEntry) {
       patchState(store, { entries: [...store.entries(), entry] });
     },
-  }))
+  })),
+
+  withHooks({
+    onInit(store) {
+      store.loadEntries();
+    },
+  })
 );

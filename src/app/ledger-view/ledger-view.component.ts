@@ -1,39 +1,34 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
+import { GridModule } from '@progress/kendo-angular-grid';
 import { JournalStore, JournalLine } from '../journal.store';
 
 @Component({
   selector: 'app-ledger-view',
   standalone: true,
-  imports: [CurrencyPipe],
+  imports: [CurrencyPipe, GridModule],
   template: `
     <h3>General Ledger</h3>
 
     @if (store.isLoading()) {
       <p>Loading entries...</p>
     } @else {
-      <table border="1" cellpadding="4">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Description</th>
-            <th>Debit</th>
-            <th>Credit</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (entry of store.entries(); track entry.id) {
-            <tr>
-              <td>{{ entry.date }}</td>
-              <td>{{ entry.description }}</td>
-              <td>{{ getDebitTotal(entry.lines) | currency }}</td>
-              <td>{{ getCreditTotal(entry.lines) | currency }}</td>
-            </tr>
-          } @empty {
-            <tr><td colspan="4">No entries yet.</td></tr>
-          }
-        </tbody>
-      </table>
+      <kendo-grid [data]="store.entries()">
+        <kendo-grid-column field="date" title="Date" [width]="120">
+        </kendo-grid-column>
+        <kendo-grid-column field="description" title="Description" [width]="200">
+        </kendo-grid-column>
+        <kendo-grid-column title="Debit" [width]="120">
+          <ng-template kendoGridCellTemplate let-dataItem>
+            {{ getDebitTotal(dataItem.lines) | currency }}
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column title="Credit" [width]="120">
+          <ng-template kendoGridCellTemplate let-dataItem>
+            {{ getCreditTotal(dataItem.lines) | currency }}
+          </ng-template>
+        </kendo-grid-column>
+      </kendo-grid>
     }
 
     @if (!store.isBalanced()) {
@@ -43,12 +38,8 @@ import { JournalStore, JournalLine } from '../journal.store';
     }
   `
 })
-export class LedgerViewComponent implements OnInit {
+export class LedgerViewComponent {
   readonly store = inject(JournalStore);
-
-  ngOnInit() {
-    this.store.loadEntries();
-  }
 
   getDebitTotal(lines: JournalLine[]) {
     return lines.reduce((s, l) => s + l.debit, 0);

@@ -1,4 +1,5 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Service, computed, signal } from '@angular/core';
+import { httpResource } from '@angular/common/http';
 
 export interface Account {
   code: string;
@@ -6,31 +7,37 @@ export interface Account {
   type: 'asset' | 'liability' | 'equity' | 'revenue' | 'expense';
 }
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class AccountService {
-  private readonly _accounts = signal<Account[]>([]);
+  private readonly _accountsRes = httpResource<Account[]>(() => '/api/accounts');
+  private readonly _localAccounts = signal<Account[]>([
+    { code: '101', name: 'Cash', type: 'asset' },
+    { code: '102', name: 'Accounts Receivable', type: 'asset' },
+    { code: '401', name: 'Sales Revenue', type: 'revenue' },
+    { code: '501', name: 'Operating Expenses', type: 'expense' }
+  ]);
   private readonly _selectedCode = signal<string | null>(null);
 
-  readonly accounts = this._accounts.asReadonly();
+  readonly accounts = computed(() => [
+    ...(this._accountsRes.value() ?? []),
+    ...this._localAccounts()
+  ]);
+  readonly isLoading = this._accountsRes.isLoading;
   readonly selectedCode = this._selectedCode.asReadonly();
 
   readonly selectedAccount = computed(() =>
-    this._accounts().find(a => a.code === this._selectedCode())
+    this.accounts().find(a => a.code === this._selectedCode())
   );
 
   readonly revenueAccounts = computed(() =>
-    this._accounts().filter(a => a.type === 'revenue')
+    this.accounts().filter(a => a.type === 'revenue')
   );
-
-  load(accounts: Account[]) {
-    this._accounts.set(accounts);
-  }
 
   selectAccount(code: string) {
     this._selectedCode.set(code);
   }
 
   addAccount(account: Account) {
-    this._accounts.update(list => [...list, account]);
+    this._localAccounts.update(list => [...list, account]);
   }
 }

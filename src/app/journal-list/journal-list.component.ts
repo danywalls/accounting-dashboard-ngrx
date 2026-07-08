@@ -1,5 +1,6 @@
 import { Component, signal, computed } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
+import { TextBoxModule } from '@progress/kendo-angular-inputs';
 
 interface JournalEntry {
   id: number;
@@ -11,12 +12,14 @@ interface JournalEntry {
 @Component({
   selector: 'app-journal-list',
   standalone: true,
-  imports: [CurrencyPipe],
+  imports: [CurrencyPipe, TextBoxModule],
   template: `
-    <input
+    <kendo-textbox
       [value]="searchTerm()"
-      (input)="updateSearch($event)"
+      (valueChange)="searchTerm.set($event)"
       placeholder="Search entries..."
+      [clearButton]="true"
+      style="width: 100%; margin-bottom: 10px;"
     />
 
     <p>Showing {{ filteredCount() }} of {{ entries().length }} entries</p>
@@ -31,7 +34,11 @@ interface JournalEntry {
   `
 })
 export class JournalListComponent {
-  readonly entries = signal<JournalEntry[]>([]);
+  readonly entries = signal<JournalEntry[]>([
+    { id: 1, date: '2026-07-01', description: 'Monthly Subscription Sale', total: 150.00 },
+    { id: 2, date: '2026-07-02', description: 'Office Supplies', total: 45.50 },
+    { id: 3, date: '2026-07-05', description: 'Consulting Service', total: 1200.00 }
+  ]);
   readonly searchTerm = signal('');
 
   readonly filteredEntries = computed(() =>
@@ -40,8 +47,4 @@ export class JournalListComponent {
     )
   );
   readonly filteredCount = computed(() => this.filteredEntries().length);
-
-  updateSearch(event: Event) {
-    this.searchTerm.set((event.target as HTMLInputElement).value);
-  }
 }
