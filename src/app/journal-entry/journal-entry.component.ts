@@ -1,11 +1,11 @@
 import { Component, inject } from '@angular/core';
-import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
+import { KENDO_DROPDOWNLIST } from '@progress/kendo-angular-dropdowns';
 import { AccountService } from '../account.service';
 
 @Component({
   selector: 'app-journal-entry',
   standalone: true,
-  imports: [DropDownListModule],
+  imports: [KENDO_DROPDOWNLIST],
   template: `
     <h3>New Journal Entry</h3>
 

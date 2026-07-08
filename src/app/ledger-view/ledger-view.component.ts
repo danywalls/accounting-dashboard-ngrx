@@ -1,12 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
-import { GridModule } from '@progress/kendo-angular-grid';
+import { KENDO_GRID } from '@progress/kendo-angular-grid';
 import { JournalStore, JournalLine } from '../journal.store';
 
 @Component({
   selector: 'app-ledger-view',
   standalone: true,
-  imports: [CurrencyPipe, GridModule],
+  imports: [CurrencyPipe, KENDO_GRID],
   template: `
     <h3>General Ledger</h3>
 

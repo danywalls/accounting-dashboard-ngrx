@@ -1,6 +1,6 @@
 import { Component, signal, computed } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
-import { TextBoxModule } from '@progress/kendo-angular-inputs';
+import { KENDO_TEXTBOX } from '@progress/kendo-angular-inputs';
 
 interface JournalEntry {
   id: number;
@@ -12,7 +12,7 @@ interface JournalEntry {
 @Component({
   selector: 'app-journal-list',
   standalone: true,
-  imports: [CurrencyPipe, TextBoxModule],
+  imports: [CurrencyPipe, KENDO_TEXTBOX],
   template: `
     <kendo-textbox
       [value]="searchTerm()"
